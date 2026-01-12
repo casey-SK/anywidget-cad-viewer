@@ -41,6 +41,10 @@ dev = [
     "pytest>=9.0.2",
     "ruff>=0.14.11",
 ]
+test = [
+    "pytest-benchmark>=5.2.3",
+    "pytest-cov>=7.0.0",
+]
 
 [tool.ruff]
 line-length = 100
@@ -73,3 +77,23 @@ ignore = [
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: Fast isolated tests",
+    "integration: End-to-end pipeline tests",
+    "whitebox: Internal implementation tests",
+    "benchmark: Performance benchmarks (slow)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["anywidget_cad_viewer"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
