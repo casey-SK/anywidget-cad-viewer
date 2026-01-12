@@ -69,126 +69,130 @@ def test_instructions(mo):
 
 
 @app.cell
-def test_1_simple_cylinder(CADViewer, Cylinder, mo):
+def test_1(CADViewer, Cylinder, mo):
     """Test 1: Simple cylinder (~1000 vertices)."""
     mo.md("### Test 1: Simple Cylinder (~1000 vertices)")
 
-    cylinder = Cylinder(radius=10, height=30)
-    viewer = CADViewer(cylinder, quality=0.1)
+    _cylinder1 = Cylinder(radius=10, height=30)
+    _viewer1 = CADViewer(_cylinder1, quality=0.1)
 
-    # Display vertex count
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count1 = len(_viewer1.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count1:,} vertices")
 
-    return (viewer,)
+    _viewer1
+    return
 
 
 @app.cell
-def test_2_detailed_sphere(CADViewer, Sphere, mo):
-    """Test 2: Detailed sphere (~5000 vertices)."""
+def test_2(CADViewer, Sphere, mo):
+    """Test 2: Detailed sphere (~5000 vertices) - PRIMARY TARGET."""
     mo.md("### Test 2: Detailed Sphere (~5000 vertices)")
-    mo.md("This is the TARGET complexity for T041 verification")
+    mo.md("**This is the TARGET complexity for T041 verification**")
 
-    sphere = Sphere(radius=15)
-    viewer = CADViewer(sphere, quality=0.08)  # Higher detail
+    _sphere2 = Sphere(radius=15)
+    _viewer2 = CADViewer(_sphere2, quality=0.08)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count2 = len(_viewer2.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count2:,} vertices")
 
-    return (viewer,)
+    _viewer2
+    return
 
 
 @app.cell
-def test_3_complex_cylinder(CADViewer, Cylinder, mo):
+def test_3(CADViewer, Cylinder, mo):
     """Test 3: High-quality cylinder (~3000 vertices)."""
     mo.md("### Test 3: High-Quality Cylinder (~3000 vertices)")
 
-    cylinder = Cylinder(radius=8, height=25)
-    viewer = CADViewer(cylinder, quality=0.05)  # Very high quality
+    _cylinder3 = Cylinder(radius=8, height=25)
+    _viewer3 = CADViewer(_cylinder3, quality=0.05)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count3 = len(_viewer3.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count3:,} vertices")
 
-    return (viewer,)
+    _viewer3
+    return
 
 
 @app.cell
-def test_4_torus(CADViewer, Torus, mo):
+def test_4(CADViewer, Torus, mo):
     """Test 4: Torus with curved surfaces (~4000 vertices)."""
     mo.md("### Test 4: Torus (~4000 vertices)")
     mo.md("Complex topology with inner/outer curved surfaces")
 
-    torus = Torus(major_radius=15, minor_radius=5)
-    viewer = CADViewer(torus, quality=0.1)
+    _torus4 = Torus(major_radius=15, minor_radius=5)
+    _viewer4 = CADViewer(_torus4, quality=0.1)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count4 = len(_viewer4.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count4:,} vertices")
 
-    return (viewer,)
+    _viewer4
+    return
 
 
 @app.cell
-def test_5_assembly(Box, CADViewer, Cylinder, Location, Sphere, mo):
+def test_5(Box, CADViewer, Cylinder, Location, Sphere, mo):
     """Test 5: Medium assembly (~6000 vertices)."""
     mo.md("### Test 5: Medium Assembly (~6000 vertices)")
     mo.md("Multiple fused objects with different geometries")
 
-    # Create a more complex assembly
-    base = Box(30, 30, 5)
-    column1 = Cylinder(radius=3, height=20).locate(Location((10, 10, 5)))
-    column2 = Cylinder(radius=3, height=20).locate(Location((-10, 10, 5)))
-    column3 = Cylinder(radius=3, height=20).locate(Location((10, -10, 5)))
-    column4 = Cylinder(radius=3, height=20).locate(Location((-10, -10, 5)))
-    top = Sphere(radius=5).locate(Location((0, 0, 25)))
+    _base5 = Box(30, 30, 5)
+    _col5_1 = Cylinder(radius=3, height=20).locate(Location((10, 10, 5)))
+    _col5_2 = Cylinder(radius=3, height=20).locate(Location((-10, 10, 5)))
+    _col5_3 = Cylinder(radius=3, height=20).locate(Location((10, -10, 5)))
+    _col5_4 = Cylinder(radius=3, height=20).locate(Location((-10, -10, 5)))
+    _top5 = Sphere(radius=5).locate(Location((0, 0, 25)))
 
-    assembly = base.fuse(column1).fuse(column2).fuse(column3).fuse(column4).fuse(top)
-    viewer = CADViewer(assembly, quality=0.1)
+    _assembly5 = _base5.fuse(_col5_1).fuse(_col5_2).fuse(_col5_3).fuse(_col5_4).fuse(_top5)
+    _viewer5 = CADViewer(_assembly5, quality=0.1)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count5 = len(_viewer5.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count5:,} vertices")
 
-    return (viewer,)
+    _viewer5
+    return
 
 
 @app.cell
-def test_6_high_detail_sphere(CADViewer, Sphere, mo):
+def test_6(CADViewer, Sphere, mo):
     """Test 6: Very high detail sphere (~8000 vertices)."""
     mo.md("### Test 6: High Detail Sphere (~8000 vertices)")
     mo.md("Near upper limit for 60fps on typical hardware")
 
-    sphere = Sphere(radius=20)
-    viewer = CADViewer(sphere, quality=0.05)  # Very high quality
+    _sphere6 = Sphere(radius=20)
+    _viewer6 = CADViewer(_sphere6, quality=0.05)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count6 = len(_viewer6.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count6:,} vertices")
 
-    return (viewer,)
+    _viewer6
+    return
 
 
 @app.cell
-def test_7_cone_array(CADViewer, Cone, Location, mo):
+def test_7(CADViewer, Cone, Location, mo):
     """Test 7: Array of cones (~5000 vertices)."""
     mo.md("### Test 7: Cone Array (~5000 vertices)")
     mo.md("Multiple objects combined")
 
-    # Create 5 cones in a circle
-    cone1 = Cone(bottom_radius=5, height=15, top_radius=0)
-    cone2 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((20, 0, 0)))
-    cone3 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((10, 17, 0)))
-    cone4 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((-10, 17, 0)))
-    cone5 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((-20, 0, 0)))
+    _cone7_1 = Cone(bottom_radius=5, height=15, top_radius=0)
+    _cone7_2 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((20, 0, 0)))
+    _cone7_3 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((10, 17, 0)))
+    _cone7_4 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((-10, 17, 0)))
+    _cone7_5 = Cone(bottom_radius=5, height=15, top_radius=0).locate(Location((-20, 0, 0)))
 
-    array = cone1.fuse(cone2).fuse(cone3).fuse(cone4).fuse(cone5)
-    viewer = CADViewer(array, quality=0.1)
+    _array7 = _cone7_1.fuse(_cone7_2).fuse(_cone7_3).fuse(_cone7_4).fuse(_cone7_5)
+    _viewer7 = CADViewer(_array7, quality=0.1)
 
-    vertex_count = len(viewer.mesh_data["vertices"]) // 3
-    mo.md(f"**Vertex count**: {vertex_count:,} vertices")
+    _count7 = len(_viewer7.mesh_data["vertices"]) // 3
+    mo.md(f"**Vertex count**: {_count7:,} vertices")
 
-    return (viewer,)
+    _viewer7
+    return
 
 
 @app.cell
-def test_8_performance_comparison(mo):
+def comparison_table(mo):
     """Test 8: Performance comparison table."""
     mo.md(
         """
@@ -196,15 +200,15 @@ def test_8_performance_comparison(mo):
         
         ### Quality vs Vertex Count
         
-        | Object | Quality | Vertex Count | Expected FPS | Status |
-        |--------|---------|--------------|--------------|--------|
-        | Cylinder | 0.1 | ~1,000 | 60fps | ✅ |
-        | Sphere | 0.08 | ~5,000 | 60fps | ✅ Target |
-        | Cylinder HQ | 0.05 | ~3,000 | 60fps | ✅ |
-        | Torus | 0.1 | ~4,000 | 60fps | ✅ |
-        | Assembly | 0.1 | ~6,000 | 60fps | ✅ |
-        | Sphere HQ | 0.05 | ~8,000 | 60fps | ✅ |
-        | Cone Array | 0.1 | ~5,000 | 60fps | ✅ |
+        | Test | Object | Quality | Approx Vertices | Expected FPS | Status |
+        |------|--------|---------|-----------------|--------------|--------|
+        | 1 | Cylinder | 0.1 | ~1,000 | 60fps | ✅ |
+        | 2 | Sphere | 0.08 | ~5,000 | 60fps | ✅ **TARGET** |
+        | 3 | Cylinder HQ | 0.05 | ~3,000 | 60fps | ✅ |
+        | 4 | Torus | 0.1 | ~4,000 | 60fps | ✅ |
+        | 5 | Assembly | 0.1 | ~6,000 | 60fps | ✅ |
+        | 6 | Sphere HQ | 0.05 | ~8,000 | 60fps | ✅ |
+        | 7 | Cone Array | 0.1 | ~5,000 | 60fps | ✅ |
         
         ### Verification Checklist
         
@@ -215,14 +219,6 @@ def test_8_performance_comparison(mo):
         - [ ] Zoom is smooth
         - [ ] Pan is smooth
         - [ ] Animation throttles when idle (check console logs)
-        
-        ### Browser Console Commands
-        
-        To manually check FPS in console:
-        ```javascript
-        // Check current FPS (if exposed)
-        performance.now()
-        ```
         
         ### What to Look For
         
@@ -251,7 +247,7 @@ def test_8_performance_comparison(mo):
 
 
 @app.cell
-def test_9_camera_features(Box, CADViewer, mo):
+def camera_demo(Box, CADViewer, mo):
     """Test 9: Camera positioning features."""
     mo.md(
         """
@@ -262,15 +258,13 @@ def test_9_camera_features(Box, CADViewer, mo):
         """
     )
 
-    # Small box - camera should be close
-    small_box = Box(1, 1, 1)
-    viewer_small = CADViewer(small_box, quality=0.1)
-    mo.md(f"**Small Box (1x1x1)**: Camera at {viewer_small.camera_position}")
+    _small_box = Box(1, 1, 1)
+    _viewer_small = CADViewer(_small_box, quality=0.1)
+    mo.md(f"**Small Box (1x1x1)**: Camera at {_viewer_small.camera_position}")
 
-    # Large box - camera should be far
-    large_box = Box(100, 100, 100)
-    viewer_large = CADViewer(large_box, quality=0.2)
-    mo.md(f"**Large Box (100x100x100)**: Camera at {viewer_large.camera_position}")
+    _large_box = Box(100, 100, 100)
+    _viewer_large = CADViewer(_large_box, quality=0.2)
+    mo.md(f"**Large Box (100x100x100)**: Camera at {_viewer_large.camera_position}")
 
     mo.md(
         """
@@ -281,11 +275,12 @@ def test_9_camera_features(Box, CADViewer, mo):
         """
     )
 
-    return viewer_small, viewer_large
+    [_viewer_small, _viewer_large]
+    return
 
 
 @app.cell
-def test_summary(mo):
+def summary(mo):
     """Display test summary."""
     mo.md(
         """
@@ -298,7 +293,7 @@ def test_summary(mo):
         **Status**: Ready for verification
         
         **Key Tests**:
-        - Test 2: Detailed Sphere (~5000 vertices) - PRIMARY TARGET
+        - **Test 2: Detailed Sphere (~5000 vertices) - PRIMARY TARGET**
         - All other tests validate performance across range of complexities
         
         **Acceptance Criteria**:
