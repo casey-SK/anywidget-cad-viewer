@@ -138,6 +138,8 @@ class CADViewer(anywidget.AnyWidget):
         # Tessellation pipeline: obj -> OCP shape -> mesh data -> serialized format
         from .geometry import (
             calculate_camera_position,
+            create_color_array,
+            extract_color,
             extract_ocp_shape,
             serialize_mesh_data,
             tessellate_shape,
@@ -150,20 +152,28 @@ class CADViewer(anywidget.AnyWidget):
             # Step 2: Tessellate the shape
             tessellation_data = tessellate_shape(shape, quality=quality)
 
-            # Step 3: Serialize to MeshData format
+            # Step 3: Extract color from build123d object
+            color_rgb = extract_color(obj)
+            if color_rgb:
+                # Calculate vertex count from tessellation
+                vertex_count = len(tessellation_data.get("vertices", [])) // 3
+                # Create per-vertex color array
+                tessellation_data["colors"] = create_color_array(vertex_count, color_rgb)
+
+            # Step 4: Serialize to MeshData format
             mesh = serialize_mesh_data(tessellation_data)
 
-            # Step 4: Check size limits (1M vertices = 3M floats)
+            # Step 5: Check size limits (1M vertices = 3M floats)
             vertex_count = len(mesh["vertices"]) // 3
             if vertex_count > 1_000_000:
                 raise OversizedGeometryError(vertex_count)
 
-            # Step 5: Calculate optimal camera position
+            # Step 6: Calculate optimal camera position
             cam_position, cam_target = calculate_camera_position(mesh)
             self.camera_position = cam_position
             self.camera_target = cam_target
 
-            # Step 6: Store in traitlet for sync to frontend
+            # Step 7: Store in traitlet for sync to frontend
             self.mesh_data = mesh
 
         except (InvalidObjectError, TessellationError, OversizedGeometryError) as e:

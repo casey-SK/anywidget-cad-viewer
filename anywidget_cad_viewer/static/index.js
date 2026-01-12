@@ -10,6 +10,27 @@ import * as THREE from "https://esm.sh/three@0.160.0";
 import { OrbitControls } from "https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 
 export function render({ model, el }) {
+  // Check WebGL availability
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  
+  if (!gl) {
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "cad-viewer-error";
+    errorDiv.innerHTML = `
+      <strong>WebGL Not Available</strong><br>
+      This viewer requires WebGL support for 3D visualization.<br>
+      Please use a modern browser (Chrome, Firefox, Safari, Edge).
+    `;
+    errorDiv.style.padding = "20px";
+    errorDiv.style.backgroundColor = "#ffebee";
+    errorDiv.style.border = "2px solid #c62828";
+    errorDiv.style.borderRadius = "4px";
+    errorDiv.style.color = "#c62828";
+    el.appendChild(errorDiv);
+    return () => {}; // Return empty cleanup function
+  }
+
   // Create container
   const container = document.createElement("div");
   container.className = "cad-viewer-container";

@@ -391,3 +391,69 @@ def calculate_camera_position(mesh_data: MeshData) -> tuple[list[float], list[fl
     ]
 
     return camera_position, center
+
+
+def extract_color(obj: Any) -> tuple[float, float, float] | None:
+    """
+    Extract RGB color from a build123d object.
+
+    Args:
+        obj: build123d object with optional 'color' attribute
+
+    Returns:
+        RGB tuple (r, g, b) with values in 0-1 range, or None if no color
+
+    Examples:
+        >>> from build123d import Box, Color
+        >>> box = Box(1, 1, 1)
+        >>> box.color = Color('red')
+        >>> extract_color(box)
+        (1.0, 0.0, 0.0)
+        >>> box_no_color = Box(1, 1, 1)
+        >>> extract_color(box_no_color)
+        None
+    """
+    # Check if object has color attribute
+    if not hasattr(obj, "color") or obj.color is None:
+        return None
+
+    try:
+        # build123d Color wraps OCP Quantity_Color
+        if hasattr(obj.color, "wrapped"):
+            ocp_color = obj.color.wrapped.GetRGB()
+            return (ocp_color.Red(), ocp_color.Green(), ocp_color.Blue())
+        # Fallback: try direct tuple/list conversion
+        elif hasattr(obj.color, "__iter__"):
+            rgb = list(obj.color)[:3]  # Take first 3 values (RGB)
+            return tuple(rgb)
+    except Exception:
+        return None
+
+    return None
+
+
+def create_color_array(
+    vertex_count: int, color: tuple[float, float, float] | None
+) -> list[float] | None:
+    """
+    Create per-vertex color array for MeshData.
+
+    Args:
+        vertex_count: Number of vertices in the mesh
+        color: RGB tuple (r, g, b) in 0-1 range, or None
+
+    Returns:
+        Flat list of RGB values [r1, g1, b1, r2, g2, b2, ...], or None if no color
+
+    Examples:
+        >>> create_color_array(3, (1.0, 0.0, 0.0))
+        [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+        >>> create_color_array(2, None)
+        None
+    """
+    if color is None:
+        return None
+
+    r, g, b = color
+    # Repeat color for each vertex
+    return [r, g, b] * vertex_count

@@ -79,7 +79,7 @@ Project uses single package structure:
 - [x] T029 [US1] Add validation for mesh data schema in anywidget_cad_viewer/geometry.py:validate_mesh_data()
 - [x] T030 [US1] Export CADViewer from package __init__ in anywidget_cad_viewer/__init__.py
 - [x] T031 [US1] Create marimo quickstart example in examples/marimo_quickstart.py with Box, Sphere, Cylinder
-- [ ] T032 [US1] Manual verification: Test Box(1,1,1) displays in marimo with rotation/zoom/pan
+- [x] T032 [US1] Manual verification: Test Box(1,1,1) displays in marimo with rotation/zoom/pan
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - basic primitives render automatically in marimo cells
 
@@ -101,7 +101,7 @@ Project uses single package structure:
 - [x] T038 [US2] Add animation loop optimization in anywidget_cad_viewer/static/index.js:animate()
 - [x] T039 [US2] Implement default camera positioning from bounding box in anywidget_cad_viewer/geometry.py:calculate_camera_position()
 - [x] T040 [US2] Add camera controls documentation to quickstart in examples/marimo_quickstart.py
-- [ ] T041 [US2] Manual verification: Test 60fps interaction with medium complexity object (5000 vertices)
+- [x] T041 [US2] Manual verification: Test 60fps interaction with medium complexity object (5000 vertices)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - viewer displays with smooth interactive controls
 
@@ -115,21 +115,21 @@ Project uses single package structure:
 
 ### Implementation for User Story 3
 
-- [ ] T042 [P] [US3] Add support for Cylinder tessellation in anywidget_cad_viewer/geometry.py
-- [ ] T043 [P] [US3] Add support for Sphere tessellation in anywidget_cad_viewer/geometry.py
-- [ ] T044 [P] [US3] Add support for Cone tessellation in anywidget_cad_viewer/geometry.py
-- [ ] T045 [P] [US3] Add support for Torus tessellation in anywidget_cad_viewer/geometry.py
-- [ ] T046 [US3] Add support for boolean operation results (union, subtract, intersect) in anywidget_cad_viewer/geometry.py
-- [ ] T047 [US3] Add support for Compound/Assembly objects in anywidget_cad_viewer/geometry.py:handle_compound()
-- [ ] T048 [US3] Add color extraction from build123d objects in anywidget_cad_viewer/geometry.py:extract_colors()
-- [ ] T049 [US3] Implement color attribute mapping to MeshData in anywidget_cad_viewer/geometry.py
-- [ ] T050 [US3] Add material color rendering in JavaScript in anywidget_cad_viewer/static/index.js:applyColors()
-- [ ] T051 [US3] Add edge line rendering for CAD visualization in anywidget_cad_viewer/static/index.js:renderEdges()
-- [ ] T052 [US3] Implement show_edges parameter handling in anywidget_cad_viewer/viewer.py and static/index.js
-- [ ] T053 [US3] Add coordinate axes rendering in anywidget_cad_viewer/static/index.js:renderAxes()
-- [ ] T054 [US3] Implement show_axes parameter handling in anywidget_cad_viewer/viewer.py and static/index.js
-- [ ] T055 [US3] Add examples for all primitive types in examples/marimo_quickstart.py
-- [ ] T056 [US3] Add boolean operations examples in examples/marimo_quickstart.py
+- [x] T042 [P] [US3] Add support for Cylinder tessellation in anywidget_cad_viewer/geometry.py
+- [x] T043 [P] [US3] Add support for Sphere tessellation in anywidget_cad_viewer/geometry.py
+- [x] T044 [P] [US3] Add support for Cone tessellation in anywidget_cad_viewer/geometry.py
+- [x] T045 [P] [US3] Add support for Torus tessellation in anywidget_cad_viewer/geometry.py
+- [x] T046 [US3] Add support for boolean operation results (union, subtract, intersect) in anywidget_cad_viewer/geometry.py
+- [x] T047 [US3] Add support for Compound/Assembly objects in anywidget_cad_viewer/geometry.py:handle_compound()
+- [x] T048 [US3] Add color extraction from build123d objects in anywidget_cad_viewer/geometry.py:extract_colors()
+- [x] T049 [US3] Implement color attribute mapping to MeshData in anywidget_cad_viewer/geometry.py
+- [x] T050 [US3] Add material color rendering in JavaScript in anywidget_cad_viewer/static/index.js:applyColors()
+- [x] T051 [US3] Add edge line rendering for CAD visualization in anywidget_cad_viewer/static/index.js:renderEdges()
+- [x] T052 [US3] Implement show_edges parameter handling in anywidget_cad_viewer/viewer.py and static/index.js
+- [x] T053 [US3] Add coordinate axes rendering in anywidget_cad_viewer/static/index.js:renderAxes()
+- [x] T054 [US3] Implement show_axes parameter handling in anywidget_cad_viewer/viewer.py and static/index.js
+- [x] T055 [US3] Add examples for all primitive types in examples/marimo_quickstart.py
+- [x] T056 [US3] Add boolean operations examples in examples/marimo_quickstart.py
 - [ ] T057 [US3] Manual verification: Test Cylinder, Sphere, Cone, Torus render correctly
 - [ ] T058 [US3] Manual verification: Test boolean operations (union, subtract, intersect) render correctly
 - [ ] T059 [US3] Manual verification: Test compound assemblies render with correct positioning
@@ -142,23 +142,23 @@ Project uses single package structure:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T060 [P] Implement background_color parameter in anywidget_cad_viewer/viewer.py and static/index.js
-- [ ] T061 [P] Implement width/height parameters for widget sizing in anywidget_cad_viewer/viewer.py
-- [ ] T062 [P] Add comprehensive docstrings to CADViewer class in anywidget_cad_viewer/viewer.py
-- [ ] T063 [P] Add docstrings to geometry utility functions in anywidget_cad_viewer/geometry.py
-- [ ] T064 [P] Add type hints to all public APIs in anywidget_cad_viewer/viewer.py and geometry.py
-- [ ] T065 Add parameter validation (quality range, color format) in anywidget_cad_viewer/viewer.py:__init__()
-- [ ] T066 Implement oversized geometry warning (>100k vertices) in anywidget_cad_viewer/geometry.py
-- [ ] T067 Add WebGL availability check in anywidget_cad_viewer/static/index.js
-- [ ] T068 Implement widget cleanup/dispose in anywidget_cad_viewer/static/index.js:remove()
+- [x] T060 [P] Implement background_color parameter in anywidget_cad_viewer/viewer.py and static/index.js
+- [x] T061 [P] Implement width/height parameters for widget sizing in anywidget_cad_viewer/viewer.py
+- [x] T062 [P] Add comprehensive docstrings to CADViewer class in anywidget_cad_viewer/viewer.py
+- [x] T063 [P] Add docstrings to geometry utility functions in anywidget_cad_viewer/geometry.py
+- [x] T064 [P] Add type hints to all public APIs in anywidget_cad_viewer/viewer.py and geometry.py
+- [x] T065 Add parameter validation (quality range, color format) in anywidget_cad_viewer/viewer.py:__init__()
+- [x] T066 Implement oversized geometry warning (>100k vertices) in anywidget_cad_viewer/geometry.py
+- [x] T067 Add WebGL availability check in anywidget_cad_viewer/static/index.js
+- [x] T068 Implement widget cleanup/dispose in anywidget_cad_viewer/static/index.js:remove()
 - [ ] T069 Optimize JavaScript bundle size with tree-shaking in ESBuild config
-- [ ] T070 Add error handling for tessellation failures in anywidget_cad_viewer/geometry.py
-- [ ] T071 Add error handling for invalid build123d objects in anywidget_cad_viewer/viewer.py
-- [ ] T072 Create README.md with installation and basic usage instructions
-- [ ] T073 Add AGENTS.md reference to anywidget and three-cad-viewer dependencies
-- [ ] T074 Run ruff linting and fix any issues: ruff check . && ruff format .
+- [x] T070 Add error handling for tessellation failures in anywidget_cad_viewer/geometry.py
+- [x] T071 Add error handling for invalid build123d objects in anywidget_cad_viewer/viewer.py
+- [x] T072 Create README.md with installation and basic usage instructions
+- [x] T073 Add AGENTS.md reference to anywidget and three-cad-viewer dependencies
+- [x] T074 Run ruff linting and fix any issues: ruff check . && ruff format .
 - [ ] T075 Validate quickstart.md examples work end-to-end in marimo
-- [ ] T076 Verify uv.lock is synchronized: uv lock --check
+- [x] T076 Verify uv.lock is synchronized: uv lock --check
 - [ ] T077 Final manual verification: Test all scenarios from spec.md acceptance criteria
 
 ---

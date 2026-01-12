@@ -41,10 +41,10 @@ def test_instructions(mo):
     mo.md(
         """
         # Performance Test Suite - T041 Verification
-        
+
         ## Test Objective
         Verify 60fps interaction with medium complexity objects (~5000 vertices)
-        
+
         ## How to Test
         1. **Open Browser Console** (F12 or Cmd+Option+I)
         2. **Interact with each viewer** below:
@@ -53,13 +53,13 @@ def test_instructions(mo):
            - Scroll to zoom
         3. **Check for smooth animation** - should feel responsive at 60fps
         4. **Watch console** for FPS warnings (warns if <30fps)
-        
+
         ## Expected Results
         ✅ Smooth 60fps interaction during mouse movement  
         ✅ No console warnings for objects shown below  
         ✅ Throttled rendering when idle (saves CPU)  
         ✅ Camera automatically frames geometry  
-        
+
         ## Performance Metrics
         Objects below range from ~1000 to ~8000 vertices.
         All should maintain 60fps on modern hardware.
@@ -197,9 +197,9 @@ def comparison_table(mo):
     mo.md(
         """
         ## Performance Comparison
-        
+
         ### Quality vs Vertex Count
-        
+
         | Test | Object | Quality | Approx Vertices | Expected FPS | Status |
         |------|--------|---------|-----------------|--------------|--------|
         | 1 | Cylinder | 0.1 | ~1,000 | 60fps | ✅ |
@@ -209,9 +209,9 @@ def comparison_table(mo):
         | 5 | Assembly | 0.1 | ~6,000 | 60fps | ✅ |
         | 6 | Sphere HQ | 0.05 | ~8,000 | 60fps | ✅ |
         | 7 | Cone Array | 0.1 | ~5,000 | 60fps | ✅ |
-        
+
         ### Verification Checklist
-        
+
         - [ ] All viewers render smoothly during interaction
         - [ ] No FPS warnings in console for tests 1-7
         - [ ] Camera automatically positions to frame geometry
@@ -219,22 +219,22 @@ def comparison_table(mo):
         - [ ] Zoom is smooth
         - [ ] Pan is smooth
         - [ ] Animation throttles when idle (check console logs)
-        
+
         ### What to Look For
-        
+
         **Good Performance (60fps)**:
         - Smooth rotation without stuttering
         - Immediate response to mouse input
         - No visible lag or dropped frames
-        
+
         **Poor Performance (<30fps)**:
         - Choppy rotation
         - Delayed response to input
         - Console warnings about low FPS
         - Visible frame drops
-        
+
         ### Troubleshooting
-        
+
         If any test shows poor performance:
         1. Check browser console for FPS warnings
         2. Try reducing quality (increase value 0.1 → 0.2)
@@ -252,7 +252,7 @@ def camera_demo(Box, CADViewer, mo):
     mo.md(
         """
         ## Camera Positioning Features (User Story 2)
-        
+
         This section demonstrates the automatic camera positioning
         and synchronization features implemented in User Story 2.
         """
@@ -262,7 +262,7 @@ def camera_demo(Box, CADViewer, mo):
     _viewer_small = CADViewer(_small_box, quality=0.1)
     mo.md(f"**Small Box (1x1x1)**: Camera at {_viewer_small.camera_position}")
 
-    _large_box = Box(100, 100, 100)
+    _large_box = Box(1000, 1000, 1000)
     _viewer_large = CADViewer(_large_box, quality=0.2)
     mo.md(f"**Large Box (100x100x100)**: Camera at {_viewer_large.camera_position}")
 
@@ -285,24 +285,24 @@ def summary(mo):
     mo.md(
         """
         ---
-        
+
         ## T041 Verification Summary
-        
+
         **Task**: Manual verification - Test 60fps interaction with medium complexity object (5000 vertices)
-        
+
         **Status**: Ready for verification
-        
+
         **Key Tests**:
         - **Test 2: Detailed Sphere (~5000 vertices) - PRIMARY TARGET**
         - All other tests validate performance across range of complexities
-        
+
         **Acceptance Criteria**:
         1. ✅ Smooth 60fps rotation, zoom, pan
         2. ✅ No FPS warnings in console
         3. ✅ Responsive interaction (no lag)
         4. ✅ Automatic camera positioning works
         5. ✅ Animation throttles when idle
-        
+
         **Next Steps**:
         - Run through all tests above
         - Mark T041 as complete in tasks.md if all pass
