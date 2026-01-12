@@ -136,7 +136,12 @@ class CADViewer(anywidget.AnyWidget):
         self.height = height
 
         # Tessellation pipeline: obj -> OCP shape -> mesh data -> serialized format
-        from .geometry import extract_ocp_shape, serialize_mesh_data, tessellate_shape
+        from .geometry import (
+            calculate_camera_position,
+            extract_ocp_shape,
+            serialize_mesh_data,
+            tessellate_shape,
+        )
 
         try:
             # Step 1: Extract OCP shape from build123d object
@@ -153,7 +158,12 @@ class CADViewer(anywidget.AnyWidget):
             if vertex_count > 1_000_000:
                 raise OversizedGeometryError(vertex_count)
 
-            # Step 5: Store in traitlet for sync to frontend
+            # Step 5: Calculate optimal camera position
+            cam_position, cam_target = calculate_camera_position(mesh)
+            self.camera_position = cam_position
+            self.camera_target = cam_target
+
+            # Step 6: Store in traitlet for sync to frontend
             self.mesh_data = mesh
 
         except (InvalidObjectError, TessellationError, OversizedGeometryError) as e:
