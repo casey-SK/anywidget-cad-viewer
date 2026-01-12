@@ -8,18 +8,18 @@ description: Generate a custom checklist for the current feature based on user r
 
 **NOT for verification/testing**:
 
-- ❌ NOT "Verify the button clicks correctly"
-- ❌ NOT "Test error handling works"
-- ❌ NOT "Confirm the API returns 200"
-- ❌ NOT checking if code/implementation matches the spec
+- [X] NOT "Verify the button clicks correctly"
+- [X] NOT "Test error handling works"
+- [X] NOT "Confirm the API returns 200"
+- [X] NOT checking if code/implementation matches the spec
 
 **FOR requirements quality validation**:
 
-- ✅ "Are visual hierarchy requirements defined for all card types?" (completeness)
-- ✅ "Is 'prominent display' quantified with specific sizing/positioning?" (clarity)
-- ✅ "Are hover state requirements consistent across all interactive elements?" (consistency)
-- ✅ "Are accessibility requirements defined for keyboard navigation?" (coverage)
-- ✅ "Does the spec define what happens when logo image fails to load?" (edge cases)
+- [OK] "Are visual hierarchy requirements defined for all card types?" (completeness)
+- [OK] "Is 'prominent display' quantified with specific sizing/positioning?" (clarity)
+- [OK] "Are hover state requirements consistent across all interactive elements?" (consistency)
+- [OK] "Are accessibility requirements defined for keyboard navigation?" (coverage)
+- [OK] "Does the spec define what happens when logo image fails to load?" (edge cases)
 
 **Metaphor**: If your spec is code written in English, the checklist is its unit test suite. You're testing whether the requirements are well-written, complete, unambiguous, and ready for implementation - NOT whether the implementation works.
 
@@ -116,12 +116,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    **HOW TO WRITE CHECKLIST ITEMS - "Unit Tests for English"**:
 
-   ❌ **WRONG** (Testing implementation):
+   **WRONG** (Testing implementation):
    - "Verify landing page displays 3 episode cards"
    - "Test hover states work on desktop"
    - "Confirm logo click navigates home"
 
-   ✅ **CORRECT** (Testing requirements quality):
+   **CORRECT** (Testing requirements quality):
    - "Are the exact number and layout of featured episodes specified?" [Completeness]
    - "Is 'prominent display' quantified with specific sizing/positioning?" [Clarity]
    - "Are hover state requirements consistent across all interactive elements?" [Consistency]
@@ -188,20 +188,20 @@ You **MUST** consider the user input before proceeding (if not empty).
    - If >5 low-impact edge cases, create one item: "Are edge cases X, Y, Z addressed in requirements? [Coverage]"
 
    **🚫 ABSOLUTELY PROHIBITED** - These make it an implementation test, not a requirements test:
-   - ❌ Any item starting with "Verify", "Test", "Confirm", "Check" + implementation behavior
-   - ❌ References to code execution, user actions, system behavior
-   - ❌ "Displays correctly", "works properly", "functions as expected"
-   - ❌ "Click", "navigate", "render", "load", "execute"
-   - ❌ Test cases, test plans, QA procedures
-   - ❌ Implementation details (frameworks, APIs, algorithms)
+   - [X] Any item starting with "Verify", "Test", "Confirm", "Check" + implementation behavior
+   - [X] References to code execution, user actions, system behavior
+   - [X] "Displays correctly", "works properly", "functions as expected"
+   - [X] "Click", "navigate", "render", "load", "execute"
+   - [X] Test cases, test plans, QA procedures
+   - [X] Implementation details (frameworks, APIs, algorithms)
 
-   **✅ REQUIRED PATTERNS** - These test requirements quality:
-   - ✅ "Are [requirement type] defined/specified/documented for [scenario]?"
-   - ✅ "Is [vague term] quantified/clarified with specific criteria?"
-   - ✅ "Are requirements consistent between [section A] and [section B]?"
-   - ✅ "Can [requirement] be objectively measured/verified?"
-   - ✅ "Are [edge cases/scenarios] addressed in requirements?"
-   - ✅ "Does the spec define [missing aspect]?"
+   **[OK] REQUIRED PATTERNS** - These test requirements quality:
+   - [OK] "Are [requirement type] defined/specified/documented for [scenario]?"
+   - [OK] "Is [vague term] quantified/clarified with specific criteria?"
+   - [OK] "Are requirements consistent between [section A] and [section B]?"
+   - [OK] "Can [requirement] be objectively measured/verified?"
+   - [OK] "Are [edge cases/scenarios] addressed in requirements?"
+   - [OK] "Does the spec define [missing aspect]?"
 
 6. **Structure Reference**: Generate the checklist following the canonical template in `.specify/templates/checklist-template.md` for title, meta section, category headings, and ID formatting. If template is unavailable, use: H1 title, purpose/created meta lines, `##` category sections containing `- [ ] CHK### <requirement item>` lines with globally incrementing IDs starting at CHK001.
 
@@ -264,7 +264,7 @@ Sample items:
 
 ## Anti-Examples: What NOT To Do
 
-**❌ WRONG - These test implementation, not requirements:**
+**[X] WRONG - These test implementation, not requirements:**
 
 ```markdown
 - [ ] CHK001 - Verify landing page displays 3 episode cards [Spec §FR-001]
@@ -273,7 +273,7 @@ Sample items:
 - [ ] CHK004 - Check that related episodes section shows 3-5 items [Spec §FR-005]
 ```
 
-**✅ CORRECT - These test requirements quality:**
+**[OK] CORRECT - These test requirements quality:**
 
 ```markdown
 - [ ] CHK001 - Are the number and layout of featured episodes explicitly specified? [Completeness, Spec §FR-001]

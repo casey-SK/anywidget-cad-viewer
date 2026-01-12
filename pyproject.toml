@@ -1,0 +1,75 @@
+[project]
+name = "anywidget-cad-viewer"
+version = "0.1.0"
+description = "An anywidget-based CAD viewer for visualizing build123d objects in marimo and Jupyter notebooks"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [
+    { name = "anywidget-cad-viewer contributors" }
+]
+keywords = ["anywidget", "cad", "build123d", "marimo", "jupyter", "3d-visualization"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "anywidget>=0.9.21",
+    "build123d>=0.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/build123d/anywidget-cad-viewer"
+Repository = "https://github.com/build123d/anywidget-cad-viewer"
+Issues = "https://github.com/build123d/anywidget-cad-viewer/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["anywidget_cad_viewer*"]
+exclude = ["specs*", "tests*", "examples*"]
+
+[dependency-groups]
+dev = [
+    "marimo>=0.19.2",
+    "pytest>=9.0.2",
+    "ruff>=0.14.11",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    "node_modules",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

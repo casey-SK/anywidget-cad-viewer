@@ -31,7 +31,25 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Before Phase 0 Research**:
+- [ ] Feature designed as anywidget component (Principle I: Widget-First Architecture)
+- [ ] Build123d integration requirements identified (Principle II: Build123d Integration)
+- [ ] New dependencies justified in plan (Principle III: Minimal Dependencies)
+- [ ] Test requirements clarified if needed (Principle IV: Test When It Matters)
+- [ ] Notebook UX considered in user scenarios (Principle V: Notebook-Centric Experience)
+- [ ] No emojis in specification or planning documents (Principle VI: No Emojis)
+- [ ] pyproject.toml structure follows uv conventions (Principle VII: uv and pyproject.toml as Source of Truth)
+- [ ] No manual dependency edits or requirements.txt files (Principle VII: uv and pyproject.toml as Source of Truth)
+
+**After Phase 1 Design**:
+- [ ] Widget API contract defined in contracts/
+- [ ] Build123d object types supported documented
+- [ ] Dependencies reviewed and justified
+- [ ] Test strategy documented if tests required
+- [ ] Example notebook usage in quickstart.md
+- [ ] All design artifacts emoji-free (Principle VI: No Emojis)
+- [ ] uv.lock synchronized with pyproject.toml (Principle VII: uv and pyproject.toml as Source of Truth)
+- [ ] All dependencies added via uv commands (Principle VII: uv and pyproject.toml as Source of Truth)
 
 ## Project Structure
 

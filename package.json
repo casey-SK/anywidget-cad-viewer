@@ -1,0 +1,17 @@
+{
+  "name": "anywidget-cad-viewer",
+  "version": "0.1.0",
+  "description": "JavaScript build configuration for anywidget CAD viewer",
+  "private": true,
+  "scripts": {
+    "build": "esbuild anywidget_cad_viewer/static/index.js --bundle --outfile=anywidget_cad_viewer/static/index.bundle.js --format=esm --minify --sourcemap",
+    "dev": "esbuild anywidget_cad_viewer/static/index.js --bundle --outfile=anywidget_cad_viewer/static/index.bundle.js --format=esm --sourcemap --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "three-cad-viewer": "^2.5.0"
+  }
+}
