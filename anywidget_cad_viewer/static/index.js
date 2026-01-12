@@ -145,14 +145,26 @@ export function render({ model, el }) {
     // Center camera on geometry
     const box = new THREE.Box3().setFromObject(meshGroup);
     const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = camera.fov * (Math.PI / 180);
-    const cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
+    
+    // Use camera position from Python model if available, otherwise calculate
+    const cameraPos = model.get("camera_position");
+    const cameraTarget = model.get("camera_target");
+    
+    if (cameraPos && cameraPos.length === 3) {
+      camera.position.set(cameraPos[0], cameraPos[1], cameraPos[2]);
+      controls.target.set(cameraTarget[0], cameraTarget[1], cameraTarget[2]);
+    } else {
+      // Fallback: calculate from bounding box
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const fov = camera.fov * (Math.PI / 180);
+      const cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
 
-    camera.position.set(center.x + cameraDistance, center.y + cameraDistance, center.z + cameraDistance);
-    camera.lookAt(center);
-    controls.target.copy(center);
+      camera.position.set(center.x + cameraDistance, center.y + cameraDistance, center.z + cameraDistance);
+      controls.target.copy(center);
+    }
+    
+    camera.lookAt(controls.target);
     controls.update();
   }
 
@@ -169,16 +181,92 @@ export function render({ model, el }) {
     scene.background = new THREE.Color(model.get("background_color"));
   });
 
-  // Animation loop
-  function animate() {
-    requestAnimationFrame(animate);
+  // Camera state synchronization to Python model
+  let lastSyncTime = 0;
+  const SYNC_THROTTLE_MS = 100; // Sync camera state every 100ms max
+
+  function syncCameraState() {
+    const now = Date.now();
+    if (now - lastSyncTime < SYNC_THROTTLE_MS) {
+      return;
+    }
+    lastSyncTime = now;
+
+    // Update Python model with current camera state
+    const position = camera.position.toArray();
+    const target = controls.target.toArray();
+    
+    model.set("camera_position", position);
+    model.set("camera_target", target);
+    model.save_changes();
+  }
+
+  // Sync camera state on controls change
+  controls.addEventListener("change", syncCameraState);
+
+  // Performance monitoring for frame rate
+  let frameCount = 0;
+  let lastFpsTime = performance.now();
+  let currentFps = 60;
+
+  function monitorFPS() {
+    frameCount++;
+    const now = performance.now();
+    const elapsed = now - lastFpsTime;
+
+    // Update FPS every second
+    if (elapsed >= 1000) {
+      currentFps = Math.round((frameCount * 1000) / elapsed);
+      frameCount = 0;
+      lastFpsTime = now;
+
+      // Log warning if FPS drops below 30
+      if (currentFps < 30) {
+        console.warn(`CAD Viewer: Low FPS detected (${currentFps} fps). Consider reducing quality or geometry complexity.`);
+      }
+    }
+  }
+
+  // Animation loop with optimization
+  let animationFrameId = null;
+  let isInteracting = false;
+  let lastRenderTime = 0;
+  const TARGET_FPS = 60;
+  const FRAME_TIME = 1000 / TARGET_FPS;
+
+  // Track interaction state
+  controls.addEventListener("start", () => {
+    isInteracting = true;
+  });
+  controls.addEventListener("end", () => {
+    isInteracting = false;
+  });
+
+  function animate(currentTime) {
+    animationFrameId = requestAnimationFrame(animate);
+
+    // Throttle rendering to target FPS when not interacting
+    if (!isInteracting) {
+      const elapsed = currentTime - lastRenderTime;
+      if (elapsed < FRAME_TIME) {
+        return;
+      }
+      lastRenderTime = currentTime - (elapsed % FRAME_TIME);
+    } else {
+      lastRenderTime = currentTime;
+    }
+
     controls.update();
     renderer.render(scene, camera);
+    monitorFPS();
   }
-  animate();
+  animate(performance.now());
 
   // Cleanup on widget destroy
   return () => {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
     renderer.dispose();
     while (meshGroup.children.length > 0) {
       const child = meshGroup.children[0];

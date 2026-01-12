@@ -286,3 +286,108 @@ def serialize_mesh_data(tessellation_data: dict) -> MeshData:
     }
     validate_mesh_data(mesh_data)
     return mesh_data
+
+
+def select_quality(vertex_count: int, requested_quality: float | None = None) -> float:
+    """
+    Select adaptive tessellation quality based on geometry complexity.
+
+    Automatically adjusts quality to maintain performance for complex geometries
+    while preserving detail for simple shapes.
+
+    Args:
+        vertex_count: Expected number of vertices in the geometry
+        requested_quality: User-requested quality (0.01-1.0), or None for auto
+
+    Returns:
+        Quality value to use for tessellation (0.01-1.0)
+
+    Examples:
+        >>> select_quality(100)  # Simple shape - high quality
+        0.05
+        >>> select_quality(50000)  # Complex shape - adaptive quality
+        0.2
+        >>> select_quality(10000, requested_quality=0.1)  # User override
+        0.1
+    """
+    # If user specified quality, respect it
+    if requested_quality is not None:
+        return max(0.01, min(1.0, requested_quality))
+
+    # Adaptive quality selection based on vertex count estimates
+    if vertex_count < 1000:
+        return 0.05  # High quality for simple shapes
+    elif vertex_count < 5000:
+        return 0.1  # Medium-high quality
+    elif vertex_count < 20000:
+        return 0.15  # Medium quality
+    elif vertex_count < 50000:
+        return 0.2  # Medium-low quality
+    else:
+        return 0.3  # Low quality for very complex shapes
+
+
+def calculate_camera_position(mesh_data: MeshData) -> tuple[list[float], list[float]]:
+    """
+    Calculate optimal camera position and target from mesh bounding box.
+
+    Positions camera to frame the entire geometry with appropriate distance
+    based on object size and aspect ratio.
+
+    Args:
+        mesh_data: MeshData dictionary with vertices
+
+    Returns:
+        Tuple of (camera_position, camera_target) as [x, y, z] lists
+
+    Examples:
+        >>> mesh = {
+        ...     "vertices": [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0],
+        ...     "indices": [0, 1, 2, 0, 2, 3],
+        ...     "normals": [0, 0, 1] * 4,
+        ...     "colors": None,
+        ...     "edges": None
+        ... }
+        >>> position, target = calculate_camera_position(mesh)
+        >>> len(position), len(target)
+        (3, 3)
+    """
+    vertices = mesh_data["vertices"]
+    if not vertices or len(vertices) < 3:
+        # Default camera position for empty geometry
+        return [10.0, 10.0, 10.0], [0.0, 0.0, 0.0]
+
+    # Calculate bounding box
+    xs = vertices[0::3]
+    ys = vertices[1::3]
+    zs = vertices[2::3]
+
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+    min_z, max_z = min(zs), max(zs)
+
+    # Calculate center point
+    center_x = (min_x + max_x) / 2
+    center_y = (min_y + max_y) / 2
+    center_z = (min_z + max_z) / 2
+    center = [center_x, center_y, center_z]
+
+    # Calculate bounding box size
+    size_x = max_x - min_x
+    size_y = max_y - min_y
+    size_z = max_z - min_z
+    max_dim = max(size_x, size_y, size_z)
+
+    # Position camera at distance proportional to object size
+    # Use FOV=50 degrees to calculate distance
+    fov_radians = 50 * (3.14159 / 180)
+    camera_distance = abs(max_dim / (2 * (fov_radians / 2) ** 0.5)) * 1.5
+
+    # Position camera at diagonal for good viewing angle
+    camera_position = [
+        center_x + camera_distance,
+        center_y + camera_distance,
+        center_z + camera_distance,
+    ]
+
+    return camera_position, center

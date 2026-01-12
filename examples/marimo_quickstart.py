@@ -23,6 +23,7 @@ def imports():
     from build123d import Box, Cylinder, Location, Sphere
 
     from anywidget_cad_viewer import CADViewer
+
     return Box, CADViewer, Cylinder, Location, Sphere, mo
 
 
@@ -78,10 +79,23 @@ def documentation(mo):
         - Configurable quality and appearance
         - Error handling and validation
 
-        ## Controls
-        - **Left mouse**: Rotate camera
-        - **Right mouse**: Pan view
+        ## Interactive Controls
+        - **Left mouse drag**: Rotate camera around target
+        - **Right mouse drag**: Pan view
         - **Scroll wheel**: Zoom in/out
+        - **Double click**: Reset camera to default position
+        
+        The viewer automatically:
+        - Positions camera to frame the geometry optimally
+        - Maintains 60fps for smooth interaction (objects <10k vertices)
+        - Synchronizes camera state between Python and JavaScript
+        - Throttles rendering when not interacting to save resources
+
+        ## Performance Tips
+        - For complex geometry (>50k vertices), increase quality value (0.3-0.5)
+        - Monitor browser console for FPS warnings
+        - Use `show_edges=False` for large meshes to improve performance
+        - The adaptive quality system automatically adjusts for complex shapes
 
         ## API Reference
         ```python

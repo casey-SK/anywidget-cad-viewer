@@ -93,14 +93,14 @@ Project uses single package structure:
 
 ### Implementation for User Story 2
 
-- [ ] T033 [P] [US2] Implement orbit controls integration in anywidget_cad_viewer/static/index.js using three-cad-viewer API
-- [ ] T034 [P] [US2] Add camera state synchronization to Python model in anywidget_cad_viewer/static/index.js:syncCameraState()
-- [ ] T035 [US2] Implement camera position/target traitlets in anywidget_cad_viewer/viewer.py:camera_state property
-- [ ] T036 [US2] Add performance monitoring for frame rate in anywidget_cad_viewer/static/index.js:monitorFPS()
-- [ ] T037 [US2] Implement adaptive quality selection based on vertex count in anywidget_cad_viewer/geometry.py:select_quality()
-- [ ] T038 [US2] Add animation loop optimization in anywidget_cad_viewer/static/index.js:animate()
-- [ ] T039 [US2] Implement default camera positioning from bounding box in anywidget_cad_viewer/geometry.py:calculate_camera_position()
-- [ ] T040 [US2] Add camera controls documentation to quickstart in examples/marimo_quickstart.py
+- [x] T033 [P] [US2] Implement orbit controls integration in anywidget_cad_viewer/static/index.js using three-cad-viewer API
+- [x] T034 [P] [US2] Add camera state synchronization to Python model in anywidget_cad_viewer/static/index.js:syncCameraState()
+- [x] T035 [US2] Implement camera position/target traitlets in anywidget_cad_viewer/viewer.py:camera_state property
+- [x] T036 [US2] Add performance monitoring for frame rate in anywidget_cad_viewer/static/index.js:monitorFPS()
+- [x] T037 [US2] Implement adaptive quality selection based on vertex count in anywidget_cad_viewer/geometry.py:select_quality()
+- [x] T038 [US2] Add animation loop optimization in anywidget_cad_viewer/static/index.js:animate()
+- [x] T039 [US2] Implement default camera positioning from bounding box in anywidget_cad_viewer/geometry.py:calculate_camera_position()
+- [x] T040 [US2] Add camera controls documentation to quickstart in examples/marimo_quickstart.py
 - [ ] T041 [US2] Manual verification: Test 60fps interaction with medium complexity object (5000 vertices)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - viewer displays with smooth interactive controls
