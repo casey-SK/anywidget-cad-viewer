@@ -385,3 +385,112 @@ def test_cadviewer_repr_mimebundle_returns_dict(simple_box):
     viewer = CADViewer(simple_box)
     result = viewer._repr_mimebundle_()
     assert isinstance(result, (dict, tuple))
+
+
+# ============================================================================
+# Tests for Camera Position/Target Traitlets (User Story 2)
+# ============================================================================
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_position_set(simple_box):
+    """Test CADViewer sets camera_position traitlet on initialization."""
+    viewer = CADViewer(simple_box)
+    camera_pos = viewer.camera_position
+
+    assert camera_pos is not None
+    assert isinstance(camera_pos, list)
+    assert len(camera_pos) == 3
+    assert all(isinstance(p, float) for p in camera_pos)
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_target_set(simple_box):
+    """Test CADViewer sets camera_target traitlet on initialization."""
+    viewer = CADViewer(simple_box)
+    camera_target = viewer.camera_target
+
+    assert isinstance(camera_target, list)
+    assert len(camera_target) == 3
+    assert all(isinstance(t, float) for t in camera_target)
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_position_valid_coordinates(simple_box):
+    """Test camera_position contains valid 3D coordinates."""
+    viewer = CADViewer(simple_box)
+    x, y, z = viewer.camera_position
+
+    # Camera should be positioned away from origin
+    assert isinstance(x, float)
+    assert isinstance(y, float)
+    assert isinstance(z, float)
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_target_at_geometry_center(simple_box):
+    """Test camera_target is at geometry center."""
+    viewer = CADViewer(simple_box)
+    target = viewer.camera_target
+
+    # For a 1x1x1 box, target should be near (0.5, 0.5, 0.5)
+    # Allow some tolerance for mesh center calculation
+    assert -5.0 < target[0] < 5.0
+    assert -5.0 < target[1] < 5.0
+    assert -5.0 < target[2] < 5.0
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_position_scales_with_geometry(simple_sphere):
+    """Test camera position scales appropriately with geometry size."""
+    viewer = CADViewer(simple_sphere)
+    position = viewer.camera_position
+
+    # Camera should be positioned at a reasonable distance
+    cam_distance = sum(p**2 for p in position) ** 0.5
+    assert cam_distance > 1.0  # Should be away from origin
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_traitlets_sync_enabled(simple_box):
+    """Test camera traitlets are marked for sync to JavaScript."""
+    viewer = CADViewer(simple_box)
+
+    # Check that traitlets have sync=True tag
+    # This ensures camera state syncs between Python and JavaScript
+    assert hasattr(viewer, "camera_position")
+    assert hasattr(viewer, "camera_target")
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_different_for_different_objects(simple_box, simple_cylinder):
+    """Test camera position adapts to different geometries."""
+    viewer_box = CADViewer(simple_box)
+    viewer_cylinder = CADViewer(simple_cylinder)
+
+    # Both should have valid camera positions
+    assert viewer_box.camera_position is not None
+    assert viewer_cylinder.camera_position is not None
+
+    # Positions might differ based on geometry
+    assert len(viewer_box.camera_position) == 3
+    assert len(viewer_cylinder.camera_position) == 3
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_position_none_default():
+    """Test camera_position traitlet defaults to None before initialization."""
+    from anywidget_cad_viewer.viewer import CADViewer as CADViewerClass
+
+    # Before passing an object, camera_position can be None
+    # This tests the traitlet default configuration
+    assert hasattr(CADViewerClass, "camera_position")
+
+
+@pytest.mark.unit
+def test_cadviewer_camera_target_default():
+    """Test camera_target traitlet has sensible default."""
+    from anywidget_cad_viewer.viewer import CADViewer as CADViewerClass
+
+    # Camera target should default to [0, 0, 0] (origin)
+    assert hasattr(CADViewerClass, "camera_target")

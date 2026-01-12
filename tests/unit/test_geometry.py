@@ -5,8 +5,10 @@ from build123d import Box
 
 from anywidget_cad_viewer.geometry import (
     MeshData,
+    calculate_camera_position,
     extract_ocp_shape,
     is_build123d_compatible,
+    select_quality,
     serialize_mesh_data,
     tessellate_shape,
     validate_mesh_data,
@@ -397,3 +399,335 @@ def test_serialize_mesh_data_from_sphere(simple_sphere):
     assert len(mesh["vertices"]) > 0
     assert len(mesh["indices"]) > 0
     assert len(mesh["normals"]) == len(mesh["vertices"])
+
+
+# ============================================================================
+# Tests for select_quality (User Story 2 - Adaptive Quality)
+# ============================================================================
+
+
+@pytest.mark.unit
+def test_select_quality_simple_shape():
+    """Test select_quality returns high quality for simple shapes (<1000 vertices)."""
+    quality = select_quality(100)
+    assert quality == 0.05
+
+
+@pytest.mark.unit
+def test_select_quality_medium_simple_shape():
+    """Test select_quality for medium-simple shapes (1000-5000 vertices)."""
+    quality = select_quality(3000)
+    assert quality == 0.1
+
+
+@pytest.mark.unit
+def test_select_quality_medium_shape():
+    """Test select_quality for medium shapes (5000-20000 vertices)."""
+    quality = select_quality(10000)
+    assert quality == 0.15
+
+
+@pytest.mark.unit
+def test_select_quality_complex_shape():
+    """Test select_quality for complex shapes (20000-50000 vertices)."""
+    quality = select_quality(30000)
+    assert quality == 0.2
+
+
+@pytest.mark.unit
+def test_select_quality_very_complex_shape():
+    """Test select_quality for very complex shapes (>50000 vertices)."""
+    quality = select_quality(100000)
+    assert quality == 0.3
+
+
+@pytest.mark.unit
+def test_select_quality_user_override():
+    """Test select_quality respects user-specified quality."""
+    quality = select_quality(10000, requested_quality=0.5)
+    assert quality == 0.5
+
+
+@pytest.mark.unit
+def test_select_quality_user_override_clamps_low():
+    """Test select_quality clamps user quality to minimum 0.01."""
+    quality = select_quality(1000, requested_quality=0.001)
+    assert quality == 0.01
+
+
+@pytest.mark.unit
+def test_select_quality_user_override_clamps_high():
+    """Test select_quality clamps user quality to maximum 1.0."""
+    quality = select_quality(1000, requested_quality=2.0)
+    assert quality == 1.0
+
+
+@pytest.mark.unit
+def test_select_quality_boundary_1000():
+    """Test select_quality at 1000 vertex boundary."""
+    assert select_quality(999) == 0.05
+    assert select_quality(1000) == 0.1
+
+
+@pytest.mark.unit
+def test_select_quality_boundary_5000():
+    """Test select_quality at 5000 vertex boundary."""
+    assert select_quality(4999) == 0.1
+    assert select_quality(5000) == 0.15
+
+
+@pytest.mark.unit
+def test_select_quality_boundary_20000():
+    """Test select_quality at 20000 vertex boundary."""
+    assert select_quality(19999) == 0.15
+    assert select_quality(20000) == 0.2
+
+
+@pytest.mark.unit
+def test_select_quality_boundary_50000():
+    """Test select_quality at 50000 vertex boundary."""
+    assert select_quality(49999) == 0.2
+    assert select_quality(50000) == 0.3
+
+
+# ============================================================================
+# Tests for calculate_camera_position (User Story 2 - Camera Positioning)
+# ============================================================================
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_empty_mesh():
+    """Test calculate_camera_position with empty mesh returns defaults."""
+    mesh: MeshData = {
+        "vertices": [],
+        "indices": [],
+        "normals": [],
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+    assert position == [10.0, 10.0, 10.0]
+    assert target == [0.0, 0.0, 0.0]
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_unit_cube():
+    """Test calculate_camera_position for unit cube at origin."""
+    # Unit cube from (0,0,0) to (1,1,1)
+    mesh: MeshData = {
+        "vertices": [
+            0.0,
+            0.0,
+            0.0,  # vertex 0
+            1.0,
+            0.0,
+            0.0,  # vertex 1
+            1.0,
+            1.0,
+            0.0,  # vertex 2
+            0.0,
+            1.0,
+            0.0,  # vertex 3
+            0.0,
+            0.0,
+            1.0,  # vertex 4
+            1.0,
+            0.0,
+            1.0,  # vertex 5
+            1.0,
+            1.0,
+            1.0,  # vertex 6
+            0.0,
+            1.0,
+            1.0,  # vertex 7
+        ],
+        "indices": [0, 1, 2],
+        "normals": [0.0, 0.0, 1.0] * 8,
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+
+    # Target should be at center of cube (0.5, 0.5, 0.5)
+    assert target == [0.5, 0.5, 0.5]
+
+    # Camera should be at a diagonal offset
+    assert len(position) == 3
+    assert all(isinstance(p, float) for p in position)
+    # Camera should be further from origin than target
+    cam_dist = sum(p**2 for p in position) ** 0.5
+    target_dist = sum(t**2 for t in target) ** 0.5
+    assert cam_dist > target_dist
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_centered_cube():
+    """Test calculate_camera_position for cube centered at origin."""
+    # Cube from (-1,-1,-1) to (1,1,1)
+    mesh: MeshData = {
+        "vertices": [
+            -1.0,
+            -1.0,
+            -1.0,
+            1.0,
+            -1.0,
+            -1.0,
+            1.0,
+            1.0,
+            -1.0,
+            -1.0,
+            1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            1.0,
+            1.0,
+            -1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            -1.0,
+            1.0,
+            1.0,
+        ],
+        "indices": [0, 1, 2],
+        "normals": [0.0, 0.0, 1.0] * 8,
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+
+    # Target should be at origin
+    assert target == [0.0, 0.0, 0.0]
+
+    # Camera should be at positive diagonal
+    assert len(position) == 3
+    assert all(p > 0 for p in position)
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_large_object():
+    """Test calculate_camera_position scales distance for large objects."""
+    # Large cube from (0,0,0) to (100,100,100)
+    mesh: MeshData = {
+        "vertices": [
+            0.0,
+            0.0,
+            0.0,
+            100.0,
+            0.0,
+            0.0,
+            100.0,
+            100.0,
+            0.0,
+            0.0,
+            100.0,
+            0.0,
+            0.0,
+            0.0,
+            100.0,
+            100.0,
+            0.0,
+            100.0,
+            100.0,
+            100.0,
+            100.0,
+            0.0,
+            100.0,
+            100.0,
+        ],
+        "indices": [0, 1, 2],
+        "normals": [0.0, 0.0, 1.0] * 8,
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+
+    # Target should be at center
+    assert target == [50.0, 50.0, 50.0]
+
+    # Camera distance should be much larger than for unit cube
+    cam_dist_from_target = sum((p - t) ** 2 for p, t in zip(position, target)) ** 0.5
+    assert cam_dist_from_target > 100  # Should be well away from object
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_flat_object():
+    """Test calculate_camera_position handles flat/2D objects."""
+    # Flat square in XY plane
+    mesh: MeshData = {
+        "vertices": [
+            0.0,
+            0.0,
+            0.0,
+            10.0,
+            0.0,
+            0.0,
+            10.0,
+            10.0,
+            0.0,
+            0.0,
+            10.0,
+            0.0,
+        ],
+        "indices": [0, 1, 2],
+        "normals": [0.0, 0.0, 1.0] * 4,
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+
+    # Target should be at center of square
+    assert target == [5.0, 5.0, 0.0]
+
+    # Camera should still be positioned properly
+    assert len(position) == 3
+    assert position[2] > 0  # Should have positive Z to see the flat object
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_from_real_box(simple_box):
+    """Test calculate_camera_position with real tessellated box."""
+    shape = extract_ocp_shape(simple_box)
+    tess_data = tessellate_shape(shape, quality=0.1)
+    mesh = serialize_mesh_data(tess_data)
+
+    position, target = calculate_camera_position(mesh)
+
+    # Should return valid position and target
+    assert len(position) == 3
+    assert len(target) == 3
+    assert all(isinstance(p, float) for p in position)
+    assert all(isinstance(t, float) for t in target)
+
+
+@pytest.mark.unit
+def test_calculate_camera_position_aspect_ratio():
+    """Test calculate_camera_position handles non-cubic aspect ratios."""
+    # Long thin object
+    mesh: MeshData = {
+        "vertices": [
+            0.0,
+            0.0,
+            0.0,
+            100.0,
+            0.0,
+            0.0,
+            100.0,
+            1.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+        ],
+        "indices": [0, 1, 2],
+        "normals": [0.0, 0.0, 1.0] * 4,
+        "colors": None,
+        "edges": None,
+    }
+    position, target = calculate_camera_position(mesh)
+
+    # Camera distance should be based on longest dimension (100)
+    cam_dist_from_target = sum((p - t) ** 2 for p, t in zip(position, target)) ** 0.5
+    assert cam_dist_from_target > 50  # Should accommodate the long dimension

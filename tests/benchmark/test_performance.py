@@ -262,3 +262,56 @@ def test_serialize_mesh_data_timing(benchmark):
 
     assert len(result["vertices"]) > 0
     assert len(result["indices"]) > 0
+
+
+# ============================================================================
+# User Story 2 Benchmarks - Camera Positioning
+# ============================================================================
+
+
+@pytest.mark.benchmark
+def test_calculate_camera_position_timing(benchmark):
+    """Benchmark calculate_camera_position performance."""
+    from anywidget_cad_viewer.geometry import calculate_camera_position
+
+    # Pre-create mesh data
+    box = Box(10, 10, 10)
+    shape = extract_ocp_shape(box)
+    tess_data = tessellate_shape(shape, quality=0.1)
+    mesh = serialize_mesh_data(tess_data)
+
+    def calc_camera():
+        return calculate_camera_position(mesh)
+
+    position, target = benchmark(calc_camera)
+
+    assert len(position) == 3
+    assert len(target) == 3
+
+
+@pytest.mark.benchmark
+def test_select_quality_timing(benchmark):
+    """Benchmark select_quality performance."""
+    from anywidget_cad_viewer.geometry import select_quality
+
+    def select():
+        return select_quality(10000)
+
+    result = benchmark(select)
+
+    assert 0.01 <= result <= 1.0
+
+
+@pytest.mark.benchmark
+def test_full_pipeline_with_camera_timing(benchmark):
+    """Benchmark full CADViewer initialization including camera calculation."""
+    box = Box(10, 10, 10)
+
+    def create_viewer():
+        return CADViewer(box, quality=0.1)
+
+    viewer = benchmark(create_viewer)
+
+    assert viewer.camera_position is not None
+    assert viewer.camera_target is not None
+    assert len(viewer.mesh_data["vertices"]) > 0

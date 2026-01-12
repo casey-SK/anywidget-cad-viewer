@@ -265,15 +265,18 @@ def test_viewer_traitlets_sync_display_options():
 
 @pytest.mark.integration
 def test_viewer_traitlets_camera_defaults():
-    """Test viewer camera traitlets have correct defaults."""
+    """Test viewer camera traitlets are calculated on initialization."""
     box = Box(10, 10, 10)
     viewer = CADViewer(box)
 
-    # Camera position defaults to None (auto-calculated by frontend)
-    assert viewer.camera_position is None
+    # Camera position is now auto-calculated on initialization (User Story 2)
+    assert viewer.camera_position is not None
+    assert isinstance(viewer.camera_position, list)
+    assert len(viewer.camera_position) == 3
 
-    # Camera target defaults to origin
-    assert viewer.camera_target == [0, 0, 0]
+    # Camera target is calculated based on geometry center
+    assert isinstance(viewer.camera_target, list)
+    assert len(viewer.camera_target) == 3
 
 
 @pytest.mark.integration
@@ -339,3 +342,120 @@ def test_pipeline_preserves_geometry_validity():
 
         # Verify no degenerate triangles (all indices different)
         assert i1 != i2 and i2 != i3 and i1 != i3
+
+
+# ============================================================================
+# Integration Tests for Camera Positioning (User Story 2)
+# ============================================================================
+
+
+@pytest.mark.integration
+def test_pipeline_sets_camera_position_for_box():
+    """Test full pipeline sets camera position for Box geometry."""
+    box = Box(10, 10, 10)
+    viewer = CADViewer(box, quality=0.1)
+
+    # Camera position should be set
+    assert viewer.camera_position is not None
+    assert len(viewer.camera_position) == 3
+    assert all(isinstance(p, float) for p in viewer.camera_position)
+
+    # Camera target should be set
+    assert viewer.camera_target is not None
+    assert len(viewer.camera_target) == 3
+
+
+@pytest.mark.integration
+def test_pipeline_camera_position_frames_geometry():
+    """Test camera position appropriately frames the geometry."""
+    # Large box
+    box = Box(100, 100, 100)
+    viewer = CADViewer(box, quality=0.2)
+
+    position = viewer.camera_position
+    target = viewer.camera_target
+
+    # Camera should be positioned away from the geometry
+    cam_distance = sum((p - t) ** 2 for p, t in zip(position, target)) ** 0.5
+
+    # For a 100x100x100 box, camera should be well away (>50 units)
+    assert cam_distance > 50
+
+
+@pytest.mark.integration
+def test_pipeline_camera_adapts_to_small_geometry():
+    """Test camera position adapts for small geometry."""
+    # Small box
+    box = Box(0.1, 0.1, 0.1)
+    viewer = CADViewer(box, quality=0.1)
+
+    position = viewer.camera_position
+    target = viewer.camera_target
+
+    # Camera should be close but not too close
+    cam_distance = sum((p - t) ** 2 for p, t in zip(position, target)) ** 0.5
+
+    # For tiny box, camera should be close (< 5 units)
+    assert 0.1 < cam_distance < 5.0
+
+
+@pytest.mark.integration
+def test_pipeline_camera_centers_on_geometry():
+    """Test camera target is centered on geometry."""
+    cylinder = Cylinder(radius=5, height=20)
+    viewer = CADViewer(cylinder, quality=0.1)
+
+    target = viewer.camera_target
+    mesh = viewer.mesh_data
+
+    # Calculate actual mesh center
+    vertices = mesh["vertices"]
+    xs = vertices[0::3]
+    ys = vertices[1::3]
+    zs = vertices[2::3]
+
+    mesh_center = [
+        (min(xs) + max(xs)) / 2,
+        (min(ys) + max(ys)) / 2,
+        (min(zs) + max(zs)) / 2,
+    ]
+
+    # Camera target should be close to mesh center
+    for t, mc in zip(target, mesh_center):
+        assert abs(t - mc) < 1.0  # Within 1 unit
+
+
+@pytest.mark.integration
+def test_pipeline_camera_consistent_across_qualities():
+    """Test camera positioning is consistent across different quality settings."""
+    sphere = Sphere(radius=10)
+    viewer_low = CADViewer(sphere, quality=0.3)
+    viewer_high = CADViewer(sphere, quality=0.05)
+
+    # Both should have similar camera positioning (based on geometry, not quality)
+    pos_low = viewer_low.camera_position
+    pos_high = viewer_high.camera_position
+
+    # Camera distances should be similar (within 20%)
+    dist_low = sum(p**2 for p in pos_low) ** 0.5
+    dist_high = sum(p**2 for p in pos_high) ** 0.5
+
+    ratio = dist_high / dist_low if dist_low > 0 else 1.0
+    assert 0.8 < ratio < 1.2
+
+
+@pytest.mark.integration
+def test_pipeline_camera_position_with_assembly(complex_assembly):
+    """Test camera positioning works with assemblies."""
+    viewer = CADViewer(complex_assembly, quality=0.2)
+
+    # Should have valid camera position for assembly
+    assert viewer.camera_position is not None
+    assert viewer.camera_target is not None
+
+    position = viewer.camera_position
+    target = viewer.camera_target
+
+    # Camera should be positioned to view entire assembly
+    cam_distance = sum((p - t) ** 2 for p, t in zip(position, target)) ** 0.5
+    assert cam_distance > 10  # Should be away from complex assembly
