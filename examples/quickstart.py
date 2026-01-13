@@ -1,15 +1,3 @@
-"""
-Marimo Quickstart Example - anywidget-cad-viewer
-
-This example demonstrates basic usage of the CAD viewer widget
-with build123d objects in a marimo notebook.
-
-To run this example:
-    1. Install the package: uv pip install -e .
-    2. Install marimo: uv pip install marimo
-    3. Run: uv run marimo edit examples/marimo_quickstart.py
-"""
-
 import marimo
 
 __generated_with = "0.19.2"
@@ -156,55 +144,6 @@ def example_6_boolean_ops(Box, CADViewer, Cylinder, Location, mo):
     _intersected = _box3.intersect(_box4)
     CADViewer(_intersected, quality=0.1, width=400, height=300)
     return
-
-
-@app.cell
-def documentation(mo):
-    """Display usage information."""
-    mo.md(
-        """
-        # anywidget-cad-viewer Examples
-
-        ## Features
-        - Automatic display of build123d objects
-        - Interactive 3D controls (orbit, zoom, pan)
-        - Configurable quality and appearance
-        - Error handling and validation
-
-        ## Interactive Controls
-        - **Left mouse drag**: Rotate camera around target
-        - **Right mouse drag**: Pan view
-        - **Scroll wheel**: Zoom in/out
-        - **Double click**: Reset camera to default position
-
-        The viewer automatically:
-        - Positions camera to frame the geometry optimally
-        - Maintains 60fps for smooth interaction (objects <10k vertices)
-        - Synchronizes camera state between Python and JavaScript
-        - Throttles rendering when not interacting to save resources
-
-        ## Performance Tips
-        - For complex geometry (>50k vertices), increase quality value (0.3-0.5)
-        - Monitor browser console for FPS warnings
-        - Use `show_edges=False` for large meshes to improve performance
-        - The adaptive quality system automatically adjusts for complex shapes
-
-        ## API Reference
-        ```python
-        CADViewer(
-            obj,                           # build123d object
-            quality=0.1,                   # 0.01-1.0 (lower = higher quality)
-            show_edges=True,               # Display edge lines
-            show_axes=True,                # Display coordinate axes
-            background_color="#F0F0F0",    # Hex color
-            width=800,                     # Widget width (pixels)
-            height=600,                    # Widget height (pixels)
-        )
-        ```
-        """
-    )
-    return
-
 
 if __name__ == "__main__":
     app.run()

@@ -208,14 +208,14 @@ Requires modern browser with WebGL 1.0+ support:
 
 ## Examples
 
-See `examples/marimo_quickstart.py` for a complete interactive tutorial:
+See `examples/quickstart.py` for a complete interactive tutorial:
 
 ```bash
 # Install marimo if not already installed
 pip install marimo
 
 # Run the examples
-marimo edit examples/marimo_quickstart.py
+marimo edit examples/quickstart.py
 ```
 
 ## Development
@@ -263,16 +263,6 @@ uv run ruff format .
 3. Mesh data (vertices, indices, normals, colors) serialized to JSON
 4. JSON synced to JavaScript via anywidget traitlets
 5. Three.js renders interactive 3D scene in browser
-
-## Contributing
-
-Contributions welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure `ruff check` passes
-5. Submit a pull request
 
 ## License
 
