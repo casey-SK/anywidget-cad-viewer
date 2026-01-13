@@ -14,7 +14,7 @@ An interactive 3D CAD viewer widget for [build123d](https://github.com/gumyr/bui
 
 ## Installation
 
-### From PyPI (when published)
+### From PyPI
 
 ```bash
 pip install anywidget-cad-viewer
