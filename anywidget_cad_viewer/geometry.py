@@ -50,12 +50,15 @@ def is_build123d_compatible(obj: Any) -> bool:
     return "TopoDS" in wrapped_type
 
 
-def validate_mesh_data(data: MeshData) -> None:
+def validate_mesh_data(data: MeshData, strict: bool = False) -> None:
     """
     Validate MeshData structure for correctness.
 
     Args:
         data: MeshData dictionary to validate
+        strict: If True, perform expensive O(n) index range validation.
+                If False (default), skip individual index checks for performance.
+                OCP always generates valid indices, so strict mode is mainly for testing.
 
     Raises:
         ValueError: If data structure is invalid
@@ -80,10 +83,12 @@ def validate_mesh_data(data: MeshData) -> None:
     if len(data["indices"]) % 3 != 0:
         raise ValueError(f"indices length must be multiple of 3, got {len(data['indices'])}")
 
-    # Validate index values
-    for idx in data["indices"]:
-        if idx < 0 or idx >= vertex_count:
-            raise ValueError(f"index {idx} out of range (vertex count: {vertex_count})")
+    # Phase 1 optimization: Only validate individual index values in strict mode
+    # OCP always generates valid indices, so this O(n) check is usually unnecessary
+    if strict:
+        for idx in data["indices"]:
+            if idx < 0 or idx >= vertex_count:
+                raise ValueError(f"index {idx} out of range (vertex count: {vertex_count})")
 
     # Validate normals array
     if len(data["normals"]) != len(data["vertices"]):
@@ -157,6 +162,8 @@ def tessellate_shape(shape, quality: float = 0.1) -> dict:
 
     try:
         # Import OCP modules (type: ignore for modules not in type checker)
+        import array  # Phase 1 optimization: use array for pre-allocation
+
         from OCP.BRep import BRep_Tool  # type: ignore
         from OCP.BRepGProp import BRepGProp_Face  # type: ignore
         from OCP.BRepMesh import BRepMesh_IncrementalMesh  # type: ignore
@@ -170,79 +177,105 @@ def tessellate_shape(shape, quality: float = 0.1) -> dict:
         mesh = BRepMesh_IncrementalMesh(shape, quality, False, 0.1, True)
         mesh.Perform()
 
-        vertices = []
-        triangles = []
-        normals = []
-
-        # Extract face triangulation
+        # Phase 1 optimization: Count vertices and triangles first for pre-allocation
         face_explorer = TopExp_Explorer(shape, TopAbs_FACE)
-        vertex_offset = 0
+        total_vertices = 0
+        total_triangles = 0
+        face_data = []  # Store face info for second pass
 
         while face_explorer.More():
             face_shape = face_explorer.Current()
-            # Cast TopoDS_Shape to TopoDS_Face
             face = TopoDS.Face_s(face_shape)
             location = TopLoc_Location()
             triangulation = BRep_Tool.Triangulation_s(face, location)
 
             if triangulation:
-                transform = location.Transformation()
-
-                # Get face orientation for normal calculation
-                face_orientation = face.Orientation()
-                orientation_sign = 1.0 if face_orientation == 0 else -1.0  # TopAbs_FORWARD = 0
-
-                # Extract vertices with computed normals
-                for i in range(1, triangulation.NbNodes() + 1):
-                    pnt = triangulation.Node(i)
-                    pnt.Transform(transform)
-                    vertices.extend([pnt.X(), pnt.Y(), pnt.Z()])
-
-                    # Compute normal from surface at UV coordinates
-                    try:
-                        if triangulation.HasUVNodes():
-                            uv = triangulation.UVNode(i)
-                            gp_pnt = gp_Pnt()
-                            gp_vec = gp_Vec()
-                            BRepGProp_Face(face).Normal(uv.X(), uv.Y(), gp_pnt, gp_vec)
-                            # Normalize and apply orientation
-                            mag = gp_vec.Magnitude()
-                            if mag > 1e-7:
-                                normals.extend(
-                                    [
-                                        orientation_sign * gp_vec.X() / mag,
-                                        orientation_sign * gp_vec.Y() / mag,
-                                        orientation_sign * gp_vec.Z() / mag,
-                                    ]
-                                )
-                            else:
-                                normals.extend([0.0, 0.0, 1.0])
-                        else:
-                            # Fallback: use default normal
-                            normals.extend([0.0, 0.0, 1.0])
-                    except Exception:
-                        # Fallback if normal computation fails
-                        normals.extend([0.0, 0.0, 1.0])
-
-                # Extract triangles
-                for i in range(1, triangulation.NbTriangles() + 1):
-                    triangle = triangulation.Triangle(i)
-                    n1, n2, n3 = triangle.Get()
-                    triangles.extend(
-                        [vertex_offset + n1 - 1, vertex_offset + n2 - 1, vertex_offset + n3 - 1]
-                    )
-
-                vertex_offset += triangulation.NbNodes()
+                nb_nodes = triangulation.NbNodes()
+                nb_triangles = triangulation.NbTriangles()
+                total_vertices += nb_nodes
+                total_triangles += nb_triangles
+                face_data.append((face, triangulation, location, nb_nodes, nb_triangles))
 
             face_explorer.Next()
 
-        if not vertices:
+        if total_vertices == 0:
             raise TessellationError("No triangulation data generated from shape")
 
+        # Phase 1 optimization: Pre-allocate arrays
+        vertices = array.array("f", [0.0] * (total_vertices * 3))
+        normals = array.array("f", [0.0] * (total_vertices * 3))
+        triangles = array.array("i", [0] * (total_triangles * 3))
+
+        # Second pass: Fill pre-allocated arrays
+        vertex_offset = 0
+        vertex_idx = 0
+        normal_idx = 0
+        triangle_idx = 0
+
+        for face, triangulation, location, nb_nodes, nb_triangles in face_data:
+            transform = location.Transformation()
+
+            # Get face orientation for normal calculation
+            face_orientation = face.Orientation()
+            orientation_sign = 1.0 if face_orientation == 0 else -1.0  # TopAbs_FORWARD = 0
+
+            # Phase 1 optimization: Cache BRepGProp_Face per face
+            face_prop = BRepGProp_Face(face) if triangulation.HasUVNodes() else None
+
+            # Extract vertices with computed normals
+            for i in range(1, nb_nodes + 1):
+                pnt = triangulation.Node(i)
+                pnt.Transform(transform)
+                vertices[vertex_idx] = pnt.X()
+                vertices[vertex_idx + 1] = pnt.Y()
+                vertices[vertex_idx + 2] = pnt.Z()
+                vertex_idx += 3
+
+                # Compute normal from surface at UV coordinates
+                try:
+                    if face_prop is not None:
+                        uv = triangulation.UVNode(i)
+                        gp_pnt = gp_Pnt()
+                        gp_vec = gp_Vec()
+                        face_prop.Normal(uv.X(), uv.Y(), gp_pnt, gp_vec)
+                        # Normalize and apply orientation
+                        mag = gp_vec.Magnitude()
+                        if mag > 1e-7:
+                            normals[normal_idx] = orientation_sign * gp_vec.X() / mag
+                            normals[normal_idx + 1] = orientation_sign * gp_vec.Y() / mag
+                            normals[normal_idx + 2] = orientation_sign * gp_vec.Z() / mag
+                        else:
+                            normals[normal_idx] = 0.0
+                            normals[normal_idx + 1] = 0.0
+                            normals[normal_idx + 2] = 1.0
+                    else:
+                        # Fallback: use default normal
+                        normals[normal_idx] = 0.0
+                        normals[normal_idx + 1] = 0.0
+                        normals[normal_idx + 2] = 1.0
+                except Exception:
+                    # Fallback if normal computation fails
+                    normals[normal_idx] = 0.0
+                    normals[normal_idx + 1] = 0.0
+                    normals[normal_idx + 2] = 1.0
+
+                normal_idx += 3
+
+            # Extract triangles
+            for i in range(1, nb_triangles + 1):
+                triangle = triangulation.Triangle(i)
+                n1, n2, n3 = triangle.Get()
+                triangles[triangle_idx] = vertex_offset + n1 - 1
+                triangles[triangle_idx + 1] = vertex_offset + n2 - 1
+                triangles[triangle_idx + 2] = vertex_offset + n3 - 1
+                triangle_idx += 3
+
+            vertex_offset += nb_nodes
+
         return {
-            "vertices": vertices,
-            "triangles": triangles,
-            "normals": normals,
+            "vertices": vertices.tolist(),
+            "triangles": triangles.tolist(),
+            "normals": normals.tolist(),
             "edges": [],  # Edge extraction implemented in T051
         }
 

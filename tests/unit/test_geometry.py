@@ -274,7 +274,7 @@ def test_validate_mesh_data_invalid_indices_length():
 
 @pytest.mark.unit
 def test_validate_mesh_data_invalid_index_out_of_range():
-    """Test validation fails for index out of range."""
+    """Test validation fails for index out of range (strict mode)."""
     mesh: MeshData = {
         "vertices": [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
         "indices": [0, 1, 5],  # Index 5 out of range (only 2 vertices)
@@ -282,8 +282,9 @@ def test_validate_mesh_data_invalid_index_out_of_range():
         "colors": None,
         "edges": None,
     }
+    # Phase 1 optimization: strict mode required for O(n) index validation
     with pytest.raises(ValueError, match="index .* out of range"):
-        validate_mesh_data(mesh)
+        validate_mesh_data(mesh, strict=True)
 
 
 @pytest.mark.unit
