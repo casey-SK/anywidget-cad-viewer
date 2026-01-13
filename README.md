@@ -159,32 +159,6 @@ CADViewer(
 - **TessellationError**: Raised when geometry tessellation fails
 - **OversizedGeometryError**: Raised when geometry exceeds 1M vertices
 
-## Performance Tips
-
-### For Complex Geometry (>50k vertices)
-
-- Increase quality value (0.3-0.5) to reduce vertex count
-- Disable edge rendering: `show_edges=False`
-- Monitor browser console for FPS warnings
-
-### Adaptive Quality System
-
-The viewer automatically adjusts tessellation quality based on estimated complexity:
-
-- <1,000 vertices: quality=0.05 (high detail)
-- 1,000-5,000 vertices: quality=0.1 (balanced)
-- 5,000-20,000 vertices: quality=0.15 (medium)
-- 20,000-50,000 vertices: quality=0.2 (optimized)
-- >50,000 vertices: quality=0.3 (performance mode)
-
-### Browser Compatibility
-
-Requires modern browser with WebGL 1.0+ support:
-- Chrome 56+
-- Firefox 52+
-- Safari 11+
-- Edge 79+
-
 ## Supported Geometry Types
 
 ### Primitives
