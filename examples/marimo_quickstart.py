@@ -23,7 +23,6 @@ def imports():
     from build123d import Box, Color, Cone, Cylinder, Location, Sphere, Torus
 
     from anywidget_cad_viewer import CADViewer
-
     return Box, CADViewer, Color, Cone, Cylinder, Location, Sphere, Torus, mo
 
 
@@ -67,7 +66,15 @@ def example_3(Box, CADViewer, Cylinder, Location, Sphere):
 
 
 @app.cell
-def example_4_primitives_all(Box, CADViewer, Cone, Cylinder, Sphere, Torus, mo):
+def example_4_primitives_all(
+    Box,
+    CADViewer,
+    Cone,
+    Cylinder,
+    Sphere,
+    Torus,
+    mo,
+):
     """Example 4: All build123d primitive types."""
     mo.md("## All Primitive Types")
 
@@ -94,8 +101,7 @@ def example_4_primitives_all(Box, CADViewer, Cone, Cylinder, Sphere, Torus, mo):
     # Torus
     mo.md("### Torus")
     _torus = Torus(major_radius=10, minor_radius=3)
-    CADViewer(_torus, quality=0.1, width=400, height=300)
-
+    CADViewer(_torus, quality=0.1, width=680, height=570)
     return
 
 
@@ -121,7 +127,6 @@ def example_5_colors(Box, CADViewer, Color, Cylinder, Sphere, mo):
     _blue_sphere = Sphere(radius=8)
     _blue_sphere.color = Color(0, 0, 1)  # RGB 0-1 range
     CADViewer(_blue_sphere, quality=0.1, width=400, height=300)
-
     return
 
 
@@ -150,7 +155,6 @@ def example_6_boolean_ops(Box, CADViewer, Cylinder, Location, mo):
     _box4 = Box(15, 15, 15).locate(Location((10, 0, 0)))
     _intersected = _box3.intersect(_box4)
     CADViewer(_intersected, quality=0.1, width=400, height=300)
-
     return
 
 
@@ -172,7 +176,7 @@ def documentation(mo):
         - **Right mouse drag**: Pan view
         - **Scroll wheel**: Zoom in/out
         - **Double click**: Reset camera to default position
-        
+
         The viewer automatically:
         - Positions camera to frame the geometry optimally
         - Maintains 60fps for smooth interaction (objects <10k vertices)
