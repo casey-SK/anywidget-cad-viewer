@@ -38,9 +38,13 @@ env/
 .coverage
 htmlcov/
 .tox/
+.benchmarks/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# marimo session files (auto-generated)
+**/__marimo__/
 
 # Node.js / JavaScript (for widget bundling)
 node_modules/
@@ -68,3 +72,8 @@ Thumbs.db
 *.swp
 *.bak
 *~
+
+# Internal development files
+.opencode/
+.specify/
+AGENTS.md

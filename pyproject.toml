@@ -22,9 +22,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/build123d/anywidget-cad-viewer"
-Repository = "https://github.com/build123d/anywidget-cad-viewer"
-Issues = "https://github.com/build123d/anywidget-cad-viewer/issues"
+Homepage = "https://github.com/casey-SK/anywidget-cad-viewer"
+Repository = "https://github.com/casey-SK/anywidget-cad-viewer"
+Issues = "https://github.com/casey-SK/anywidget-cad-viewer/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]

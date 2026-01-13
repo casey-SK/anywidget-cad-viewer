@@ -23,7 +23,7 @@ pip install anywidget-cad-viewer
 ### From Source
 
 ```bash
-git clone https://github.com/YOUR-ORG/anywidget-cad-viewer
+git clone https://github.com/casey-SK/anywidget-cad-viewer
 cd anywidget-cad-viewer
 pip install -e .
 ```
@@ -276,7 +276,7 @@ Contributions welcome! Please:
 
 ## License
 
-[LICENSE TO BE ADDED]
+MIT License - see [LICENSE](LICENSE) file for details
 
 ## Credits
 
@@ -288,6 +288,6 @@ Built with:
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR-ORG/anywidget-cad-viewer/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR-ORG/anywidget-cad-viewer/discussions)
+- **Issues**: [GitHub Issues](https://github.com/casey-SK/anywidget-cad-viewer/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/casey-SK/anywidget-cad-viewer/discussions)
 - **Documentation**: See `examples/` directory for comprehensive examples
